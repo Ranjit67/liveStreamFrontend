@@ -158,7 +158,6 @@ export default function VideoStream() {
   const [name, setname] = useState();
   const [requestList, setrequestList] = useState([]); //json data 'clientId' and 'name'
   const [clik, setclik] = useState(false);
-  const [peer, setpeer] = useState([]);
   const optionHandle = () => {
     setoption((user) => !user);
     sethostAOption([]);
