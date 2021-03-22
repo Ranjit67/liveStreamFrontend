@@ -169,7 +169,7 @@ export default function VideoStream() {
   useEffect(() => {
     //http://localhost:5000/
     //https://app-streamapi.herokuapp.com/
-    socketRef.current = io.connect("http://localhost:5000/");
+    socketRef.current = io.connect("https://app-streamapi.herokuapp.com/");
     if (id2) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })

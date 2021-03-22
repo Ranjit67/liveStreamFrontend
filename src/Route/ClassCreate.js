@@ -43,7 +43,7 @@ function ClassCreate(props) {
   useEffect(() => {
     //https://app-streamapi.herokuapp.com/
     //http://localhost:5000/
-    socketRef.current = io.connect("http://localhost:5000/");
+    socketRef.current = io.connect("https://app-streamapi.herokuapp.com/");
   }, []);
   const inputHandler = (e) => {
     setsubject(e.target.value);
