@@ -169,7 +169,7 @@ export default function VideoStream() {
   useEffect(() => {
     //http://localhost:5000/
     //https://app-streamapi.herokuapp.com/
-    socketRef.current = io.connect("https://app-streamapi.herokuapp.com/");
+    socketRef.current = io.connect("http://localhost:5000/");
     if (id2) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -283,16 +283,22 @@ export default function VideoStream() {
       });
     });
     socketRef.current.on("clint belong", (payload) => {
+      console.log(hostPeer);
+      // hostPeer.peer.peer.destroy();
       sethostPeer();
       history.push("/");
     });
     socketRef.current.on("one client leave", (payload) => {
       console.log(payload.clientId);
       setcountClient((countPrev) => countPrev - 1);
+      const findData = peersRef.current.find(
+        (id) => id.peerID === payload.clientId
+      );
       const afterDisconnectClient = peersRef.current.filter(
         (id) => id.peerID !== payload.clientId
       );
       peersRef.current = afterDisconnectClient;
+      findData.peer.destroy();
       socketRef.current.emit("remove the client", {
         removeId: payload.clientId,
         room: id,
