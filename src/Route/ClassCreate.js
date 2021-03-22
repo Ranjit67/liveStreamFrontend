@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Button, withStyles } from "@material-ui/core";
+import { Button, withStyles, TextField } from "@material-ui/core";
 import { useHistory } from "react-router";
 import { v4 as uuid } from "uuid";
 import io from "socket.io-client";
@@ -19,7 +19,7 @@ const useStyles = (theme) => ({
     backgroundColor: "#ff7675",
   },
   inputField: {
-    height: "26px",
+    // height: "26px",
     marginRight: "20px",
   },
 });
@@ -50,10 +50,18 @@ function ClassCreate(props) {
   };
   return (
     <div className={classes.root}>
-      <input
+      {/* <input
         type="text"
         name="subjectName"
         placeholder="Enter Subject name"
+        className={classes.inputField}
+        onChange={inputHandler}
+      /> */}
+      <TextField
+        id="standard-basic"
+        type="text"
+        name="subjectName"
+        label="Enter Subject name"
         className={classes.inputField}
         onChange={inputHandler}
       />

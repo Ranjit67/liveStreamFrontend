@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useHistory } from "react-router";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import { Button, makeStyles } from "@material-ui/core";
+import { Button, makeStyles, TextField } from "@material-ui/core";
 import PeerVideo from "./PeerVideo";
 
 const useStyles = makeStyles((theme) => ({
@@ -60,7 +60,13 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-around",
-    // width: "140%",
+    width: "140%",
+    [theme.breakpoints.down("sm")]: {
+      width: "90%",
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: "140%",
+    },
   },
   privateBtn: {
     backgroundColor: "#b2bec3",
@@ -115,13 +121,29 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
+  nameDiv: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    height: "100%",
+  },
+  subName: {
+    backgroundColor: "#c8d6e5",
+    marginLeft: "20px",
+  },
+  linkBtnOffOn: {
+    backgroundColor: "#b2bec3",
+    marginTop: "40px",
+  },
 }));
 export default function VideoStream() {
   const { id, id2 } = useParams();
   const socketRef = useRef();
   const myVideo = useRef();
   const peersRef = useRef([]);
-  // const [videoAudio, setvideoAudio] = useState(true);
+  const [showLink, setshowLink] = useState(false);
   const [hostAOption, sethostAOption] = useState([]);
   const [hostBOption, sethostBOption] = useState([]); //it cont json clientId, name, optionClik
   const [hostCOption, sethostCOption] = useState([]);
@@ -233,15 +255,15 @@ export default function VideoStream() {
         clientId: payload.clientId,
       };
       switch (payload.optionData) {
-        case "a": {
+        case "A": {
           sethostAOption((user) => [...user, data]);
           break;
         }
-        case "b": {
+        case "B": {
           sethostBOption((user) => [...user, data]);
           break;
         }
-        case "c": {
+        case "C": {
           sethostCOption((user) => [...user, data]);
           break;
         }
@@ -380,14 +402,24 @@ export default function VideoStream() {
   const history = useHistory();
   return clik || id2 ? (
     <div className={classes.root}>
-      {/* {id2 && ( )} */}
-      <div className={classes.linksCode}>
-        <p>share link:</p>
-        <p>https://app-stream-video.herokuapp.com/video/{id}/</p>
-        <p>OR</p>
-        <p>CODE :{id}</p>
-      </div>
-
+      {id2 && (
+        <Button
+          className={classes.linkBtnOffOn}
+          onClick={() => {
+            setshowLink((prev) => !prev);
+          }}
+        >
+          {!showLink ? "CLICK FOR FIND LINK FOR SHARE" : "close"}
+        </Button>
+      )}
+      {id2 && showLink && (
+        <div className={classes.linksCode}>
+          <p>share link:</p>
+          <p>https://app-stream-video.herokuapp.com/video/{id}/</p>
+          <p>OR</p>
+          <p>CODE :{id}</p>
+        </div>
+      )}
       {id2 && (
         <>
           {courseName && <h3>Subject: {courseName}</h3>}
@@ -560,13 +592,21 @@ export default function VideoStream() {
       {message && message}
     </div>
   ) : (
-    <div>
-      <input
+    <div className={classes.nameDiv}>
+      {/* <input
         type="text"
         placeholder="Enter your name"
         onChange={(e) => setname(e.target.value)}
+      /> */}
+      <TextField
+        id="standard-basic"
+        type="text"
+        label="Enter your name"
+        onChange={(e) => setname(e.target.value)}
       />
-      <button onClick={handelClik}>Clik</button>
+      <Button className={classes.subName} onClick={handelClik}>
+        Clik
+      </Button>
     </div>
   );
 }

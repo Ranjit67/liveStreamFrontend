@@ -1,5 +1,15 @@
+import { makeStyles } from "@material-ui/core";
 import { useEffect, useRef } from "react";
-
+const useStyles = makeStyles((theme) => ({
+  peerVideo: {
+    [theme.breakpoints.up("md")]: {
+      width: "70%",
+    },
+    [theme.breakpoints.down("md")]: {
+      width: "100%",
+    },
+  },
+}));
 export default function PeerVideo(props) {
   const ref = useRef();
 
@@ -8,6 +18,6 @@ export default function PeerVideo(props) {
       ref.current.srcObject = stream;
     });
   }, []);
-
-  return <video width="50%" playsInline autoPlay ref={ref} />;
+  const classes = useStyles();
+  return <video className={classes.peerVideo} playsInline autoPlay ref={ref} />;
 }
