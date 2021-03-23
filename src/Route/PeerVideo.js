@@ -2,6 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import { useEffect, useRef } from "react";
 const useStyles = makeStyles((theme) => ({
   peerVideo: {
+    marginTop: 50,
     [theme.breakpoints.up("md")]: {
       width: "70%",
     },

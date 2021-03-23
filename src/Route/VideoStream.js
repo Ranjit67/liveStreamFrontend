@@ -2,8 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useHistory } from "react-router";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import { Button, makeStyles, TextField } from "@material-ui/core";
+import {
+  Button,
+  makeStyles,
+  TextField,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
 import PeerVideo from "./PeerVideo";
+import ShareIcon from "@material-ui/icons/Share";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -11,8 +21,10 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
+    position: "relative",
   },
   optionAndNumPepleCont: {
+    marginTop: 20,
     width: "90%",
     display: "flex",
     justifyContent: "space-between",
@@ -32,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
       width: "20%",
     },
   },
-  acceptAllRequest: {
+  acceptAllRequestDiv: {
     marginTop: "30px",
     width: "95%",
   },
@@ -76,9 +88,23 @@ const useStyles = makeStyles((theme) => ({
     margin: "10px 0 20px 0",
     backgroundColor: "#636e72",
   },
+  acceptAllreq: {
+    backgroundColor: "#95a5a6",
+  },
+  acceptBtn: {
+    backgroundColor: "#CAD3C8",
+    marginRight: "20px",
+  },
+  rejectBtn: {
+    backgroundColor: "#B53471",
+  },
   leaveMeetingBtn: {
     margin: "10px 0 20px 0",
-    backgroundColor: "#e17055",
+    backgroundColor: "#c8d6e5",
+    transition: "1s",
+    "&:hover": {
+      color: "white",
+    },
   },
   optionItem: {
     margin: "10px 0 20px 0",
@@ -111,9 +137,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   pepleConnect: {
-    [theme.breakpoints.down("md")]: {},
+    [theme.breakpoints.down("md")]: {
+      marginTop: 15,
+    },
   },
   selfVideo: {
+    marginTop: 50,
     [theme.breakpoints.up("md")]: {
       width: "70%",
     },
@@ -137,13 +166,90 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#b2bec3",
     marginTop: "40px",
   },
+  //side draw css
+  sideDrawPapear: {
+    position: "absolute",
+    top: 47,
+    left: 1,
+    // height: "400px",
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+    backgroundColor: "#c8d6e5",
+    [theme.breakpoints.down("sm")]: {
+      width: 230,
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: 300,
+    },
+  },
+  menuBarAndSName: {
+    display: "flex",
+    alignItems: "center",
+  },
+  parentDivAppBarIconAndshare: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  shareIcoDivAppbar: {
+    display: "flex",
+    alignItems: "center",
+  },
+  sharebtnAppbar: {
+    color: "white",
+  },
+  shareInManu: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    cursor: "pointer",
+    justifyContent: "center",
+    transition: "1s",
+    "&:hover": {
+      backgroundColor: "#576574",
+      color: "white",
+    },
+  },
+  shareText: {
+    marginRight: 10,
+  },
+  leaveMeetingManuBar: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    cursor: "pointer",
+    justifyContent: "center",
+    transition: "1s",
+    "&:hover": {
+      backgroundColor: "#576574",
+      color: "white",
+    },
+  },
+  pubAndPriInManu: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    cursor: "pointer",
+    justifyContent: "center",
+    transition: "1s",
+    "&:hover": {
+      backgroundColor: "#576574",
+      color: "white",
+    },
+  },
+
+  courseNameClient: {
+    marginLeft: 20,
+  },
 }));
 export default function VideoStream() {
   const { id, id2 } = useParams();
   const socketRef = useRef();
   const myVideo = useRef();
   const peersRef = useRef([]);
-  const [showLink, setshowLink] = useState(false);
+  const [sideDraw, setsideDraw] = useState(false);
   const [hostAOption, sethostAOption] = useState([]);
   const [hostBOption, sethostBOption] = useState([]); //it cont json clientId, name, optionClik
   const [hostCOption, sethostCOption] = useState([]);
@@ -235,6 +341,7 @@ export default function VideoStream() {
         peerID: payload.hostSelfId,
         peer,
       });
+      setcourseName(payload.courseName);
     });
     socketRef.current.on("receiving returned signal", (payload) => {
       setmessage();
@@ -293,6 +400,7 @@ export default function VideoStream() {
       const findData = peersRef.current.find(
         (id) => id.peerID === payload.clientId
       );
+
       const afterDisconnectClient = peersRef.current.filter(
         (id) => id.peerID !== payload.clientId
       );
@@ -338,6 +446,7 @@ export default function VideoStream() {
   // host function
 
   const publicHandler = () => {
+    setsideDraw(false);
     socketRef.current.emit("user public status", {
       public: publicer,
       roomId: id,
@@ -405,6 +514,7 @@ export default function VideoStream() {
   };
   const shareLink = () => {
     // setshowLink((prev) => !prev);
+    setsideDraw(false);
     if (navigator.share) {
       navigator
         .share({
@@ -417,58 +527,76 @@ export default function VideoStream() {
         .catch((err) => console.log(err));
     }
   };
+  const sideDrawaHandel = () => {
+    setsideDraw((prev) => !prev);
+  };
   const classes = useStyles();
   const history = useHistory();
   return clik || id2 ? (
     <div className={classes.root}>
-      {/* {id2 && (
-        <Button className={classes.linkBtnOffOn} onClick={shareLink}>
-          {!showLink ? "CLICK FOR FIND LINK FOR SHARE" : "close"}
-        </Button>
-      )} */}
-      {id2 && (
-        <Button className={classes.linkBtnOffOn} onClick={shareLink}>
-          CLICK FOR FIND LINK FOR SHARE
-        </Button>
-      )}
-      {/* {id2 && showLink && (
-        <div className={classes.linksCode}>
-          <p>share link:</p>
-          <p>https://app-stream-video.herokuapp.com/video/{id}/</p>
-          <p>OR</p>
-          <p>CODE :{id}</p>
-        </div>
-      )} */}
-      {id2 && (
-        <>
-          {courseName && <h3>Subject: {courseName}</h3>}
-          {publicer ? (
-            <Button className={classes.publicBtn} onClick={publicHandler}>
-              Go to Public
-            </Button>
-          ) : (
-            <Button className={classes.privateBtn} onClick={publicHandler}>
-              Go to Private
-            </Button>
-          )}
-          {id2 && (
-            <video
-              muted
-              className={classes.selfVideo}
-              ref={myVideo}
-              autoPlay
-              playsInline
-            />
-          )}
-        </>
-      )}
+      {/* //appbar */}
+      <AppBar position="static">
+        <Toolbar variant="dense">
+          <div className={classes.parentDivAppBarIconAndshare}>
+            <div className={classes.menuBarAndSName}>
+              {id2 && (
+                <IconButton
+                  edge="start"
+                  className={classes.menuButton}
+                  color="inherit"
+                  aria-label="menu"
+                  onClick={sideDrawaHandel}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
+              {courseName && id2 && (
+                <Typography variant="h6" color="inherit">
+                  {courseName}
+                </Typography>
+              )}
+              {!id2 && (
+                <Button
+                  className={classes.leaveMeetingBtn}
+                  onClick={leaveMeeting}
+                >
+                  Leave meeting
+                </Button>
+              )}
+            </div>
+            <div className={classes.shareIcoDivAppbar}>
+              {id2 && (
+                <IconButton
+                  className={classes.sharebtnAppbar}
+                  onClick={shareLink}
+                >
+                  <ShareIcon />
+                </IconButton>
+              )}
+              {!id2 && courseName && (
+                <h3 className={classes.courseNameClient}> {courseName}</h3>
+              )}
+            </div>
+          </div>
+        </Toolbar>
+      </AppBar>
 
-      <Button className={classes.leaveMeetingBtn} onClick={leaveMeeting}>
-        Leave meeting
-      </Button>
+      {/* //end app bar */}
+
+      {id2 && (
+        <video
+          muted
+          className={classes.selfVideo}
+          ref={myVideo}
+          autoPlay
+          playsInline
+        />
+      )}
+      {/* </>
+      )} */}
 
       {!id2 && hostPeer && (
-        <PeerVideo width="50%" key={hostPeer.peerID} peer={hostPeer.peer} />
+        <PeerVideo key={hostPeer.peerID} peer={hostPeer.peer} />
       )}
       <div className={classes.optionAndNumPepleCont}>
         {id2 && (
@@ -546,8 +674,10 @@ export default function VideoStream() {
         </div>
       )}
       {requestList.length > 1 && (
-        <div className={classes.acceptAllRequest}>
-          <button onClick={acceptAllRequest}>Accept all request</button>
+        <div className={classes.acceptAllRequestDiv}>
+          <Button className={classes.acceptAllreq} onClick={acceptAllRequest}>
+            Accept all request
+          </Button>
         </div>
       )}
       <div className={classes.requestList}>
@@ -555,8 +685,18 @@ export default function VideoStream() {
           requestList.map((key, index) => (
             <div key={key.clientId} className={classes.oneByOneRequestDiv}>
               <p>{key.name} request to join</p>
-              <button onClick={() => acceptRequest(index)}>Accept</button>
-              <button onClick={() => rejectRequest(index)}>Reject</button>
+              <Button
+                className={classes.acceptBtn}
+                onClick={() => acceptRequest(index)}
+              >
+                Accept
+              </Button>
+              <Button
+                className={classes.rejectBtn}
+                onClick={() => rejectRequest(index)}
+              >
+                Reject
+              </Button>
             </div>
           ))}
       </div>
@@ -609,6 +749,38 @@ export default function VideoStream() {
           </div>
         )}
       {message && message}
+      {sideDraw && (
+        <div className={classes.sideDrawPapear}>
+          {id2 && (
+            <>
+              {publicer ? (
+                <div
+                  className={classes.pubAndPriInManu}
+                  onClick={publicHandler}
+                >
+                  <h5>Go to Public</h5>
+                </div>
+              ) : (
+                <div
+                  className={classes.pubAndPriInManu}
+                  onClick={publicHandler}
+                >
+                  <h5>Go to Private</h5>
+                </div>
+              )}
+            </>
+          )}
+          {id2 && (
+            <div className={classes.shareInManu} onClick={shareLink}>
+              <h4 className={classes.shareText}>Share </h4>
+              <ShareIcon />
+            </div>
+          )}
+          <div className={classes.leaveMeetingManuBar} onClick={leaveMeeting}>
+            <h4>Leave meeting</h4>
+          </div>
+        </div>
+      )}
     </div>
   ) : (
     <div className={classes.nameDiv}>
