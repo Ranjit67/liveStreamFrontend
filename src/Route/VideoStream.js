@@ -403,28 +403,42 @@ export default function VideoStream() {
       setoption(false);
     }
   };
+  const shareLink = () => {
+    // setshowLink((prev) => !prev);
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Example Page",
+          url: `https://app-stream-video.herokuapp.com/video/${id}/`,
+        })
+        .then(() => {
+          console.log("data succesfully send.");
+        })
+        .catch((err) => console.log(err));
+    }
+  };
   const classes = useStyles();
   const history = useHistory();
   return clik || id2 ? (
     <div className={classes.root}>
-      {id2 && (
-        <Button
-          className={classes.linkBtnOffOn}
-          onClick={() => {
-            setshowLink((prev) => !prev);
-          }}
-        >
+      {/* {id2 && (
+        <Button className={classes.linkBtnOffOn} onClick={shareLink}>
           {!showLink ? "CLICK FOR FIND LINK FOR SHARE" : "close"}
         </Button>
+      )} */}
+      {id2 && (
+        <Button className={classes.linkBtnOffOn} onClick={shareLink}>
+          CLICK FOR FIND LINK FOR SHARE
+        </Button>
       )}
-      {id2 && showLink && (
+      {/* {id2 && showLink && (
         <div className={classes.linksCode}>
           <p>share link:</p>
           <p>https://app-stream-video.herokuapp.com/video/{id}/</p>
           <p>OR</p>
           <p>CODE :{id}</p>
         </div>
-      )}
+      )} */}
       {id2 && (
         <>
           {courseName && <h3>Subject: {courseName}</h3>}
